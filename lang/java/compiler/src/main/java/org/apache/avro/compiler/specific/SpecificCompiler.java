@@ -58,6 +58,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -979,20 +981,35 @@ public class SpecificCompiler {
       if (field.schema().getLogicalType() != null) {
         return true;
       }
+      if (field.schema().isUnion()
+          && field.schema().getTypes().stream().map(Schema::getLogicalType).anyMatch(Objects::nonNull)) {
+        return true;
+      }
     }
     return false;
   }
 
   public String conversionInstance(Schema schema) {
-    if (schema == null || schema.getLogicalType() == null) {
+    if (schema == null) {
       return "null";
     }
 
-    if (LogicalTypes.Decimal.class.equals(schema.getLogicalType().getClass()) && !enableDecimalLogicalType) {
+    final LogicalType logicalType;
+    if (schema.isUnion()) {
+      logicalType = schema.getTypes().stream().map(Schema::getLogicalType).filter(Objects::nonNull).findFirst()
+          .orElse(null);
+    } else {
+      logicalType = schema.getLogicalType();
+    }
+    if (logicalType == null) {
       return "null";
     }
 
-    final Conversion<Object> conversion = specificData.getConversionFor(schema.getLogicalType());
+    if (LogicalTypes.Decimal.class.equals(logicalType.getClass()) && !enableDecimalLogicalType) {
+      return "null";
+    }
+
+    final Conversion<Object> conversion = specificData.getConversionFor(logicalType);
     if (conversion != null) {
       return "new " + conversion.getClass().getCanonicalName() + "()";
     }

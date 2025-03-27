@@ -740,6 +740,15 @@ public class TestSpecificCompiler {
   }
 
   @Test
+  void logicalTypesWithMultipleOptionalFields() throws Exception {
+    Schema logicalTypesWithMultipleOptionalFields = new Schema.Parser()
+        .parse(new File("src/test/resources/logical_types_with_multiple_optional_fields.avsc"));
+    Collection<SpecificCompiler.OutputFile> output = new SpecificCompiler(logicalTypesWithMultipleOptionalFields)
+        .compile();
+    assertCompilesWithJavaCompiler(new File(OUTPUT_DIR, "testLogicalTypesWithMultipleOptionalFields"), output, true);
+  }
+
+  @Test
   void unionAndFixedFields() throws Exception {
     Schema unionTypesWithMultipleFields = new Schema.Parser()
         .parse(new File("src/test/resources/union_and_fixed_fields.avsc"));

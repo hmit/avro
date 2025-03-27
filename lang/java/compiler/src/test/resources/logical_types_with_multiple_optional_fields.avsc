@@ -1,0 +1,44 @@
+{
+  "namespace": "schema.common",
+  "type": "record",
+  "name": "ActionOptional",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "uuid",
+      "type": "string"
+    },
+    {
+      "name": "time",
+      "type": ["null", {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }]
+    },
+    {
+      "name": "requestId",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "timeRecordOptional",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "TimeMicrosRecord",
+          "fields": [
+            {"name": "time", "type": ["null", {"type": "long", "logicalType": "time-micros"}], "default": null}
+          ]
+        }
+      ],
+      "default": null
+    }
+  ]
+}
